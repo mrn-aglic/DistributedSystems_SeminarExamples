@@ -2,6 +2,10 @@ package common
 
 import java.util.Date
 
+import common.MeasurementHelpers.clearThreadsList
+
+import scala.collection.immutable
+
 /**
   * Created by Marin on 28/04/2017.
   */
@@ -14,6 +18,8 @@ object MeasurementHelpers {
 	def numThread(): List[Long] = _numThreads
 
 	def getDistinctThreads: List[Long] = _numThreads.distinct
+
+	def clearThreadsList(): Unit = _numThreads = List[Long]()
 
 	def addCurrentThreadWith[A](block: => A): A = {
 
@@ -37,4 +43,14 @@ object MeasurementHelpers {
 
 		(duration, result)
 	}
+
+	def runNTimes[A](n: Int)(block: => A): List[(Int, Long, List[Long])] = {
+
+		for{
+			i <- 1 to n
+			val (duration, _) = time(block)
+			val distinctThreads = getDistinctThreads
+
+		} yield (i, duration, getDistinctThreads)
+	}.toList
 }

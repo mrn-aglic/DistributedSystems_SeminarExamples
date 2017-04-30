@@ -5,6 +5,6 @@ package common
   */
 object Configuration {
 
-	val numberOfRows = 10
-	val numberOfCols = 10
+	val numberOfRows = 300
+	val numberOfCols = 300
 }
