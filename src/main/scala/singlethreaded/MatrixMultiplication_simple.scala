@@ -14,28 +14,29 @@ object MatrixMultiplication_simple {
 
 	def main(args: Array[String]): Unit = {
 
-		val nrow = Configuration.numberOfRows
-		val ncol = Configuration.numberOfCols
+		val n = 100
 
-		// stvorimo prvu matricu
-		val firstMatrix = createMatrix(nrow, ncol)
-		// stvorimo drugu matricu
-		val secondMatrix = createMatrix(nrow, ncol)
+		val runNTimes = MeasurementHelpers.runNTimes(n) _
 
-		/*println("first matrix")
-		firstMatrix.foreach(println)
+		val results = runNTimes {
 
-		println("second matrix")
-		secondMatrix.foreach(println)
-		*/
+			val nrow = Configuration.numberOfRows
+			val ncol = Configuration.numberOfCols
 
-		val (duration, _) = MeasurementHelpers.time(doWork(nrow, ncol, firstMatrix, secondMatrix))
+			// stvorimo prvu matricu
+			val firstMatrix = createMatrix(nrow, ncol)
+			// stvorimo drugu matricu
+			val secondMatrix = createMatrix(nrow, ncol)
 
-		println(s"Duration: $duration milliseconds")
+			// posao koji se želi odraditi: Množenje matrica
+			matrixMultiply(nrow, ncol, firstMatrix, secondMatrix)
+		}
 
-		println(s"number of distinct threads: ${MeasurementHelpers.getDistinctThreads.length}")
-		println("all distinct threads: ")
-		MeasurementHelpers.getDistinctThreads.foreach(x => print(s"$x\t"))
+		// ispišemo prosječnu brzinu izvršavanja
+		println(s"Average duration: ${results.map(x => x._2).sum / n}")
+		// ispišemo prosječan broj niti
+		println(s"Average number of distinct threads: ${results.map(x => x._3.length).sum / 100}")
+
 		println()
 	}
 
@@ -43,7 +44,7 @@ object MatrixMultiplication_simple {
 	def createMatrix(row: Int, col: Int): List[List[Int]] =
 		(1 to row).map(x => (1 to col).map(_ => r.nextInt(10)).toList).toList
 
-	def doWork(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]])(): Unit = {
+	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]])(): Unit = {
 
 		val result = Array.ofDim[List[Int]](nrow)
 
