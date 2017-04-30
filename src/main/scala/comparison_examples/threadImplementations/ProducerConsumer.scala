@@ -26,7 +26,7 @@ object ProducerConsumer {
 			producer.join()
 		}
 
-		println(s"Sum of all obtained items ${consumers.get.map(x => x.getObtainedItems().length).sum}")
+		println(s"Sum of all obtained items ${consumers.get.map(x => x.getObtainedItems.length).sum}")
 
 		println(s"Duration: $duration milliseconds")
 
@@ -36,7 +36,7 @@ object ProducerConsumer {
 		println()
 
 		println("Consumers gained values")
-		consumers.get.foreach(x => println(s"${x.getObtainedItems().length}"))
+		consumers.get.foreach(x => println(s"${x.getObtainedItems.length}"))
 		println()
 	}
 
@@ -72,7 +72,7 @@ class Consumer(sharedQueue: mutable.Queue[Item]) extends Thread {
 
 	private var obtainedItems = List[Item]()
 
-	def getObtainedItems(): List[Item] = obtainedItems
+	def getObtainedItems: List[Item] = obtainedItems
 
 	override def run(): Unit = {
 
