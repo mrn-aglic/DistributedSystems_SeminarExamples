@@ -36,7 +36,7 @@ object MatrixMultiplication {
 		    val secondMatrix = createMatrix(nrow, ncol)
 
 		    // posao koji se želi odraditi: Množenje matrica
-		    doWork(nrow, ncol, firstMatrix, secondMatrix)
+		    matrixMultiply(nrow, ncol, firstMatrix, secondMatrix)
 	    }
 
 	    // ispišemo prosječnu brzinu izvršavanja
@@ -47,7 +47,7 @@ object MatrixMultiplication {
 	    println()
     }
 
-	def doWork(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]])(): Unit = {
+	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]])(): Unit = {
 
 		val result = Array.ofDim[List[Int]](nrow)
 
