@@ -14,7 +14,7 @@ object MatrixMultiplication_simple {
 
 	def main(args: Array[String]): Unit = {
 
-		val n: Double = 100
+		val n: Double = Configuration.runTimes
 
 		val runNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 

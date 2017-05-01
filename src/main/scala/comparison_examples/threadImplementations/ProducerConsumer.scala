@@ -15,11 +15,13 @@ object ProducerConsumer {
 
 	def main(args: Array[String]): Unit = {
 
+		val workToProduce = Configuration.workToProduce
+
 		var consumers: Option[List[Consumer]] = None
 
 		val (duration, _) = MeasurementHelpers.time {
 
-			val producer = producerWork()
+			val producer = producerWork(workToProduce)
 			consumers = Some(startConsumers(10, List[Consumer](), sharedQueue))
 
 			consumers.get.foreach(_.join())
@@ -40,9 +42,9 @@ object ProducerConsumer {
 		println()
 	}
 
-	def producerWork(): Thread = thread {
+	def producerWork(n: Int): Thread = thread {
 
-		for (i <- 1 to 500) {
+		for (i <- 1 to n) {
 
 			val item = Item(i)
 
