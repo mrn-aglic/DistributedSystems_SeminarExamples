@@ -7,20 +7,21 @@ import java.util.Date
   */
 object MeasurementHelpers {
 
-	private var _numThreads = List[Long]()
+	private var _numThreads = List[Thread]()
 
-	def addCurrentThread(): Unit = _numThreads = Thread.currentThread().getId :: _numThreads
+	def addCurrentThread(): Unit = _numThreads = Thread.currentThread() :: _numThreads
 
-	def numThread(): List[Long] = _numThreads
+	def numThread(): List[Thread] = _numThreads
 
-	def getDistinctThreads: List[Long] = _numThreads.distinct
+	def getDistinctThreads: List[Thread] = _numThreads.distinct
 
-	def getAndClearThreadsList(): List[Long] = {
+	def getAndClearThreadsList(): List[Thread] = {
 
 		val temp = _numThreads
-		_numThreads = List[Long]()
+		_numThreads = List[Thread]()
 
-		temp
+		//println(temp.distinct.length)
+		temp.distinct
 	}
 
 	def addCurrentThreadWith[A](block: => A): A = {
@@ -46,7 +47,7 @@ object MeasurementHelpers {
 		(duration, result)
 	}
 
-	def runNTimes[A](n: Int)(block: => A): List[(Int, Long, List[Long])] = {
+	def runNTimes[A](n: Int)(block: => A): List[(Int, Long, List[Thread])] = {
 
 		for{
 			i <- 1 to n

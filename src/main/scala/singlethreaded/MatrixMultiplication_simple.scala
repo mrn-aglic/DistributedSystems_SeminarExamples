@@ -14,9 +14,9 @@ object MatrixMultiplication_simple {
 
 	def main(args: Array[String]): Unit = {
 
-		val n = 100
+		val n: Double = 100
 
-		val runNTimes = MeasurementHelpers.runNTimes(n) _
+		val runNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
 		val results = runNTimes {
 
@@ -72,23 +72,5 @@ object MatrixMultiplication_simple {
 
 			result.update(i, newRow)
 		}
-
-		/*println("result")
-		result.foreach(println)*/
-	}
-
-	def thread(block: => Unit): Thread = {
-
-		val t = new Thread {
-
-			override def run(): Unit = {
-
-				block
-			}
-		}
-
-		t.start()
-
-		t
 	}
 }

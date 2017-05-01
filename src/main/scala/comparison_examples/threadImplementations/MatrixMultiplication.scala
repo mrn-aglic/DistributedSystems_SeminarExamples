@@ -1,7 +1,5 @@
 package comparison_examples.threadImplementations
 
-import java.util.Date
-
 import scala.util.Random
 
 /**
@@ -21,9 +19,9 @@ object MatrixMultiplication {
 
     def main(args: Array[String]): Unit = {
 
-	    val n = 100
+	    val n: Double = 100
 
-	    val runNTimes = MeasurementHelpers.runNTimes(n) _
+	    val runNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
 	    val results = runNTimes {
 
@@ -42,7 +40,8 @@ object MatrixMultiplication {
 	    // ispišemo prosječnu brzinu izvršavanja
 		println(s"Average duration: ${results.map(x => x._2).sum / n}")
 	    // ispišemo prosječan broj niti
-	    println(s"Average number of distinct threads: ${results.map(x => x._3.length).sum / 100}")
+
+	    println(s"Average number of distinct threads: ${results.map(x => x._3.length).sum / n}")
 
 	    println()
     }
