@@ -35,7 +35,7 @@ class ExpensiveEntity {
 
 object Singleton {
 
-  var instance: ExpensiveEntity = null
+  var instance: ExpensiveEntity = _
 
   def getInstance(): ExpensiveEntity = {
 

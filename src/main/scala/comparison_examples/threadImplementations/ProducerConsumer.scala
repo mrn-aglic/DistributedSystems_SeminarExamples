@@ -1,9 +1,7 @@
 package comparison_examples.threadImplementations
 
 import common.MeasurementHelpers._
-import common.ThreadHelpers.thread
 import common._
-import comparison_examples.threadImplementations.ProducerConsumer.sharedQueue
 
 import scala.collection.mutable
 
