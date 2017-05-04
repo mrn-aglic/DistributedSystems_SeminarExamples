@@ -8,5 +8,6 @@ object Configuration {
 	val numberOfRows = 100
 	val numberOfCols = 100
 	val runTimes = 100
-	val workToProduce = 500
+	val workToProduce = 10000
+	val numberOfConsumers = 100
 }

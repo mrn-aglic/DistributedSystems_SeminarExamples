@@ -3,63 +3,49 @@ package comparison_examples.threadImplementations
 import common.MeasurementHelpers._
 import common.ThreadHelpers.thread
 import common._
+import comparison_examples.threadImplementations.ProducerConsumer.sharedQueue
 
 import scala.collection.mutable
 
 /**
   * Created by Marin on 29/04/2017.
   */
+
+case class Item(value: Int)
+
 object ProducerConsumer {
 
 	private val sharedQueue = mutable.Queue[Item]()
 
 	def main(args: Array[String]): Unit = {
 
-		val workToProduce = Configuration.workToProduce
+		val n: Double = if(args.nonEmpty) args(0).toDouble else Configuration.runTimes.toDouble
+		val numConsumers = if(args.length == 2) args(1).toInt else Configuration.numberOfConsumers
 
-		var consumers: Option[List[Consumer]] = None
+		val funRunNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
-		val (duration, _) = MeasurementHelpers.time {
+		var consumers: List[List[Int]] = List[List[Int]]()
 
-			val producer = producerWork(workToProduce)
-			consumers = Some(startConsumers(10, List[Consumer](), sharedQueue))
+		val results = funRunNTimes {
 
-			consumers.get.foreach(_.join())
+			Helper.isFinished = false
+
+			val producer = new Producer(sharedQueue)
+			val cs = startConsumers(numConsumers, List[Consumer](), sharedQueue)
+
+			cs.foreach(_.join())
 			producer.join()
 		}
 
-		println(s"Sum of all obtained items ${consumers.get.map(x => x.getObtainedItems.length).sum}")
+		println(s"Run times: $n")
+		println(s"Average duration: ${results.map(x => x._2).sum / n} milliseconds")
 
-		println(s"Duration: $duration milliseconds")
-
-		println(s"number of distinct threads: ${getDistinctThreads.length}")
-		println("all distinct threads: ")
-		getDistinctThreads.foreach(x => print(s"$x\t"))
 		println()
-
-		println("Consumers gained values")
-		consumers.get.foreach(x => println(s"${x.getObtainedItems.length}"))
-		println()
-	}
-
-	def producerWork(n: Int): Thread = thread {
-
-		for (i <- 1 to n) {
-
-			val item = Item(i)
-
-			sharedQueue.synchronized {
-
-				sharedQueue.enqueue(item)
-				sharedQueue.notifyAll()
-			}
-		}
 	}
 
 	def startConsumers(max: Int, result: List[Consumer], sharedQueue: mutable.Queue[Item]): List[Consumer] =
-		if(max == 0) result
+		if (max == 0) result
 		else {
-
 			val consumer = new Consumer(sharedQueue)
 
 			consumer.start()
@@ -68,7 +54,33 @@ object ProducerConsumer {
 		}
 }
 
-case class Item(value: Int)
+object Helper {
+	var isFinished = false
+}
+
+class Producer(sharedQueue: mutable.Queue[Item]) extends Thread {
+
+	override def run(): Unit = {
+
+		val n = Configuration.workToProduce
+
+		for (i <- 1 to n) {
+
+			val item = Item(i)
+
+			// pristup dijeljenom resursu mora biti sinkroniziran
+			sharedQueue.synchronized {
+
+				sharedQueue.enqueue(item)
+				sharedQueue.notifyAll()
+			}
+		}
+
+		Helper.isFinished = true
+	}
+
+	start()
+}
 
 class Consumer(sharedQueue: mutable.Queue[Item]) extends Thread {
 
@@ -80,22 +92,31 @@ class Consumer(sharedQueue: mutable.Queue[Item]) extends Thread {
 
 		addCurrentThread()
 
-		while(obtainedItems.length < 50) {
+		while (sharedQueue.nonEmpty || !Helper.isFinished) {
 
-			obtainedItems = getItem :: obtainedItems
+			obtainedItems = getItem match {
+
+				case None => obtainedItems
+				case Some(item) => item :: obtainedItems
+			}
 		}
-		//println(obtainedItems)
 	}
 
-	def getItem: Item =
+	def getItem: Option[Item] =
+	// pristup dijeljenom resurse (redu) mora biti sinkroniziran
 		sharedQueue.synchronized {
 
-			while (sharedQueue.isEmpty) {
+			while (sharedQueue.isEmpty && !Helper.isFinished) {
 
 				sharedQueue.wait()
 			}
 
-			sharedQueue.dequeue()
+			sharedQueue.notifyAll()
+
+			if (sharedQueue.nonEmpty)
+				Some(sharedQueue.dequeue())
+			else
+				None
 		}
 
 	def printObtainedItems(): Unit =
