@@ -34,20 +34,24 @@ object MatrixMultiplication {
 		    // stvorimo drugu matricu
 		    val secondMatrix = createMatrix(nrow, ncol)
 
-		    firstMatrix.foreach(println)
-		    println("------------------------")
-		    secondMatrix.foreach(println)
+		    //val transposedMatrix = transpose(secondMatrix)
+
+		    //firstMatrix.foreach(println)
+		    //println("------------------------")
+		    //secondMatrix.foreach(println)
 
 		    // posao koji se želi odraditi: Množenje matrica
-			matrixMultiply(nrow, ncol, firstMatrix, secondMatrix) onComplete {
+			/*matrixMultiply(nrow, ncol, firstMatrix, secondMatrix) onComplete {
 
 				case Success(matrix) => matrix.foreach(x => println(s"$x"))
 				case Failure(x) => println(s"failed matrix multiplication...${x.getMessage}")
-			}
+			}*/
 
-		    //val f = matrixMultiply(nrow, ncol, firstMatrix, secondMatrix)
+		    val f = matrixMultiply(nrow, ncol, firstMatrix, secondMatrix)
 
-		    //Await.result(f, 5 seconds )
+		    Await.result(f, Duration.Inf)
+
+		    println(MeasurementHelpers.getDistinctThreads.length)
 	    }
 
 	    // ispišemo prosječnu brzinu izvršavanja
@@ -61,25 +65,25 @@ object MatrixMultiplication {
 
 	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]]): Future[List[List[Int]]] = {
 
-		val seqOfFutures = (0 until nrow).map(x => multiplyRowByMatrix(firstMatrix(x), secondMatrix)).toList
+		val seqOfFutures = firstMatrix.map(x => multiplyRowByMatrix(x, secondMatrix))
 
 		val allFutures = Future.sequence(seqOfFutures)
 
 		allFutures
 	}
 
-	def transpose(m: List[List[Int]]): List[List[Int]] =
-		if(m.head.isEmpty) Nil
-		else m.map(_.head) :: transpose(m.map(_.tail))
-
 	def multiplyRowByMatrix(row: List[Int], secondMatrix: List[List[Int]]): Future[List[Int]] = Future {
 
 		MeasurementHelpers.addCurrentThread()
 
-		val nrow = row.length
-
-		val newRow = (0 until nrow).map(index => (0 until nrow).map(r => secondMatrix(r)(index) * row(r)).sum)
-
-		newRow.toList
+		secondMatrix.map(x => multiplyRows(row, x))
 	}
+
+	def multiplyRows(r1: List[Int], r2: List[Int]): Int =
+		r1.zip(r2).map { case (x, y) => x * y }.sum
+
+	def transpose(m: List[List[Int]]): List[List[Int]] =
+		if(m.head.isEmpty) Nil
+		else m.map(_.head) :: transpose(m.map(_.tail))
+
 }

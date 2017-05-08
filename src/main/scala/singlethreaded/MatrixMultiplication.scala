@@ -15,7 +15,7 @@ object MatrixMultiplication {
     def createMatrix(row: Int, col: Int): List[List[Int]] =
 	    (1 to row).map(x => (1 to col).map(_ => r.nextInt(10)).toList).toList
 
-	def multyplyRows(r1: List[Int], r2: List[Int]): Int =
+	def multiplyRows(r1: List[Int], r2: List[Int]): Int =
 		r1.zip(r2).map { case (x, y) => x * y }.sum
 
 	def transpose(m: List[List[Int]]): List[List[Int]] =
@@ -48,7 +48,7 @@ object MatrixMultiplication {
 
 		    val result = firstMatrix.map { x =>
 
-			    transposedSecondMatrix.map(y => multyplyRows(x, y))
+			    transposedSecondMatrix.map(y => multiplyRows(x, y))
 		    }
 	    })
 
