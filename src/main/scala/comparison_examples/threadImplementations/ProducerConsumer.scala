@@ -5,10 +5,6 @@ import common._
 
 import scala.collection.mutable
 
-/**
-  * Created by Marin on 29/04/2017.
-  */
-
 case class Item(value: Int)
 
 object ProducerConsumer {
