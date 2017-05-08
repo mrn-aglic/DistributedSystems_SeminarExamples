@@ -5,8 +5,8 @@ package common
   */
 object Configuration {
 
-	val numberOfRows = 100
-	val numberOfCols = 100
+	val numberOfRows = 300
+	val numberOfCols = 300
 	val runTimes = 100
 	val workToProduce = 10000
 	val numberOfConsumers = 100

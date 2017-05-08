@@ -46,7 +46,7 @@ object MatrixMultiplication {
 	    println()
     }
 
-	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]])(): Unit = {
+	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]]): Unit = {
 
 		val result = Array.ofDim[List[Int]](nrow)
 
