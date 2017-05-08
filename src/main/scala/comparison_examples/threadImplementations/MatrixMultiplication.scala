@@ -1,5 +1,6 @@
 package comparison_examples.threadImplementations
 
+import scala.concurrent.Future
 import scala.util.Random
 
 /**
