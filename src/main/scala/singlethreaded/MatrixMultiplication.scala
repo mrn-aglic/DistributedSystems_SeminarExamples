@@ -50,7 +50,7 @@ object MatrixMultiplication {
 
 			    transposedSecondMatrix.map(y => multiplyRows(x, y))
 		    }
-	    })
+	    }, None)
 
 	    println(s"Duration: $duration milliseconds")
 

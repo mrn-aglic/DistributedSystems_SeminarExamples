@@ -34,8 +34,10 @@ object MatrixMultiplication_Functional {
 			// stvorimo drugu matricu
 			val secondMatrix = createMatrix(nrow, ncol)
 
+			val transposedMatrix = transpose(secondMatrix)
+
 			// posao koji se želi odraditi: Množenje matrica
-			matrixMultiply(nrow, ncol, firstMatrix, secondMatrix)
+			matrixMultiply(nrow, ncol, firstMatrix, transposedMatrix)
 		}
 
 		// ispišemo prosječnu brzinu izvršavanja

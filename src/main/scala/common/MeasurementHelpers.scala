@@ -30,10 +30,15 @@ object MeasurementHelpers {
 		block
 	}
 
-	def time[A](block: => A): (Long, A) = {
+	def time[A](block: => A, num: Option[Int]): (Long, A) = {
 
 		val now = System.currentTimeMillis()
 
+		num match {
+
+			case None =>
+			case Some(x) => print(s"run number: $x, ")
+		}
 		println(s"start time: ${new Date(now)}")
 
 		val result = block
@@ -51,7 +56,7 @@ object MeasurementHelpers {
 
 		for{
 			i <- 1 to n
-			val (duration, _) = time(block)
+			val (duration, _) = time(block, Some(i))
 			val distinctThreads = getAndClearThreadsList()
 
 		} yield (i, duration, distinctThreads)

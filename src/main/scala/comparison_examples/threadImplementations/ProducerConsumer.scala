@@ -18,8 +18,6 @@ object ProducerConsumer {
 
 		val funRunNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
-		var consumers: List[List[Int]] = List[List[Int]]()
-
 		val results = funRunNTimes {
 
 			Helper.isFinished = false
@@ -29,6 +27,8 @@ object ProducerConsumer {
 
 			cs.foreach(_.join())
 			producer.join()
+
+			println(s"Total items consumed: ${cs.map(x => x.getObtainedItems.length).sum}")
 		}
 
 		println(s"Run times: $n")
