@@ -43,7 +43,7 @@ object ProducerConsumer {
 		}
 
 		println(s"Run times: $n")
-		println(s"Average number of distinct threads: ${results.map(x => x._3.length).sum / n }")
+		println(s"Average number of distinct threads: ${results.map(x => x._3.length).sum / n}")
 		println(s"Average duration: ${results.map(x => x._2).sum / n} milliseconds")
 
 		println()
@@ -64,23 +64,24 @@ class Producer(p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
 
 		val n = Configuration.workToProduce
 
-		//blocking {
-			for (i <- 1 to n) {
+		for (i <- 1 to n) {
 
-				val item = Item(i)
+			val item = Item(i)
 
-				//blocking {
-					// pristup dijeljenom resursu mora biti sinkroniziran
-					sharedQueue.synchronized {
+			// pristup dijeljenom resursu mora biti sinkroniziran
+			sharedQueue.synchronized {
 
-						sharedQueue.enqueue(item)
-						sharedQueue.notifyAll()
-					}
-				//}
+				sharedQueue.enqueue(item)
+				sharedQueue notify()
 			}
-		//}
+		}
 
 		p success true
+
+		sharedQueue.synchronized {
+
+			sharedQueue.notifyAll()
+		}
 	}
 }
 
@@ -94,20 +95,18 @@ class Consumer(p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
 
 		addCurrentThread()
 
-		//blocking {
-			while (sharedQueue.nonEmpty || !p.isCompleted) {
+		while (sharedQueue.nonEmpty || !p.isCompleted) {
 
-				obtainedItems = getItem match {
+			obtainedItems = getItem match {
 
-					case None => obtainedItems
-					case Some(item) => item :: obtainedItems
-				}
+				case None => obtainedItems
+				case Some(item) => item :: obtainedItems
 			}
-		//}
+		}
 	}
 
 	def getItem: Option[Item] = blocking {
-		// pristup dijeljenom resurse (redu) mora biti sinkroniziran
+
 		sharedQueue.synchronized {
 
 			while (sharedQueue.isEmpty && !p.isCompleted) {
@@ -119,8 +118,6 @@ class Consumer(p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
 				Some(sharedQueue.dequeue())
 			else
 				None
-
-			sharedQueue.notifyAll()
 
 			result
 		}
