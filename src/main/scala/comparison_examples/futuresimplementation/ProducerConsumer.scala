@@ -26,6 +26,8 @@ object ProducerConsumer {
 
 			val p = Promise[Boolean]()
 
+			setNumThreads(Array.ofDim[Long](numConsumers))
+
 			val producer = new Producer(p, sharedQueue)
 			val cs = startConsumers(numConsumers, List[Consumer](), sharedQueue, p)
 
@@ -52,7 +54,7 @@ object ProducerConsumer {
 	def startConsumers(max: Int, result: List[Consumer], sharedQueue: mutable.Queue[Item], p: Promise[Boolean]): List[Consumer] =
 		if (max == 0) result
 		else {
-			val consumer = new Consumer(p, sharedQueue)
+			val consumer = new Consumer(max - 1, p, sharedQueue)
 
 			startConsumers(max - 1, consumer :: result, sharedQueue, p)
 		}
@@ -85,7 +87,7 @@ class Producer(p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
 	}
 }
 
-class Consumer(p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
+class Consumer(index:Int, p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
 
 	private var obtainedItems = List[Item]()
 
@@ -93,7 +95,7 @@ class Consumer(p: Promise[Boolean], sharedQueue: mutable.Queue[Item]) {
 
 	def start(): Future[Unit] = Future {
 
-		addCurrentThread()
+		addCurrentThread(index)
 
 		while (sharedQueue.nonEmpty || !p.isCompleted) {
 

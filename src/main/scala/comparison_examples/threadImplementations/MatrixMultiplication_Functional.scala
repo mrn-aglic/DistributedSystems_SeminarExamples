@@ -53,7 +53,11 @@ object MatrixMultiplication_Functional {
 
 		var result = Array.ofDim[List[Int]](nrow)
 
+		MeasurementHelpers.setNumThreads(Array.ofDim[Long](nrow))
+
 		val threads = firstMatrix.zipWithIndex.map { case(x, index) => thread {
+
+			MeasurementHelpers.addCurrentThread(index)
 
 			result.update(index, multiplyRowByMatrix(x, secondMatrix))
 		}}
@@ -64,8 +68,6 @@ object MatrixMultiplication_Functional {
 	}
 
 	def multiplyRowByMatrix(row: List[Int], secondMatrix: List[List[Int]]): List[Int] =  {
-
-		MeasurementHelpers.addCurrentThread()
 
 		secondMatrix.map(x => multiplyRows(row, x))
 	}

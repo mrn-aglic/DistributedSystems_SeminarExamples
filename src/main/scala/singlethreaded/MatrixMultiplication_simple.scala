@@ -54,7 +54,7 @@ object MatrixMultiplication_simple {
 
 			val row = firstMatrix(i)
 
-			MeasurementHelpers.addCurrentThread()
+			//MeasurementHelpers.addCurrentThread()
 
 			var newRow = List[Int]()
 

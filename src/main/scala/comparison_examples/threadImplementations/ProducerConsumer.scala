@@ -11,14 +11,10 @@ object ProducerConsumer {
 
 	private val sharedQueue = mutable.Queue[Item]()
 
-	//var xs: List[Long] = List[Long]()
-
 	def main(args: Array[String]): Unit = {
 
 		val n: Double = if(args.nonEmpty) args(0).toDouble else Configuration.runTimes.toDouble
 		val numConsumers = if(args.length == 2) args(1).toInt else Configuration.numberOfConsumers
-
-		//var ls = List[Long]()
 
 		val funRunNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
@@ -26,15 +22,11 @@ object ProducerConsumer {
 
 			Helper.isFinished = false
 
+			setNumThreads(Array.ofDim[Long](numConsumers))
+
 			val producer = new Producer(sharedQueue)
 
-			val now = System.currentTimeMillis()
-
 			val cs = startConsumers(numConsumers, List[Consumer](), sharedQueue)
-
-			val cur = System.currentTimeMillis()
-
-			//ls = (cur - now) :: ls
 
 			cs.foreach(_.join())
 			producer.join()
@@ -45,22 +37,15 @@ object ProducerConsumer {
 		println(s"Run times: $n")
 		println(s"Average duration: ${results.map(x => x._2).sum / n} milliseconds")
 
-		//println(s"average time for creating consumers: ${ls.sum / n} milliseconds")
-		//println(s"${xs.length}")
-		//println(s"average time for starting a thread: ${xs.sum / n} milliseconds")
-
 		println()
 	}
 
 	def startConsumers(max: Int, result: List[Consumer], sharedQueue: mutable.Queue[Item]): List[Consumer] =
 		if (max == 0) result
 		else {
-			val consumer = new Consumer(sharedQueue)
-			//val now = System.currentTimeMillis()
+			val consumer = new Consumer(max - 1, sharedQueue)
 			consumer.start()
-			//val cur = System.currentTimeMillis()
 
-			//xs = (cur - now) :: xs
 			startConsumers(max - 1, consumer :: result, sharedQueue)
 		}
 }
@@ -97,7 +82,7 @@ class Producer(sharedQueue: mutable.Queue[Item]) extends Thread {
 	start()
 }
 
-class Consumer(sharedQueue: mutable.Queue[Item]) extends Thread {
+class Consumer(index: Int, sharedQueue: mutable.Queue[Item]) extends Thread {
 
 	private var obtainedItems = List[Item]()
 
@@ -105,7 +90,7 @@ class Consumer(sharedQueue: mutable.Queue[Item]) extends Thread {
 
 	override def run(): Unit = {
 
-		addCurrentThread()
+		addCurrentThread(index)
 
 		while (sharedQueue.nonEmpty || !Helper.isFinished) {
 

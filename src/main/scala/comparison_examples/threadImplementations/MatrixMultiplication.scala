@@ -53,6 +53,9 @@ object MatrixMultiplication {
 
 		var threads = List[Thread]()
 
+		val array = Array.ofDim[Long](nrow)
+		MeasurementHelpers.setNumThreads(array)
+
 		for(i <- 0 until nrow){
 
 			val row = firstMatrix(i)
@@ -60,7 +63,7 @@ object MatrixMultiplication {
 			// stvorimo po jednu nit za svaku red prve matrice
 			val t = thread {
 
-				MeasurementHelpers.addCurrentThread()
+				MeasurementHelpers.addCurrentThread(i)
 
 				var newRow = List[Int]()
 

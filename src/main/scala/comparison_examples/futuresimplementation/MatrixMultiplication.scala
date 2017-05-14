@@ -11,6 +11,7 @@ import scala.util.Random
   */
 object MatrixMultiplication {
 
+	import common.MeasurementHelpers._
 	import common.{Configuration, MeasurementHelpers}
 
 	val r = new Random()
@@ -26,6 +27,8 @@ object MatrixMultiplication {
 			val nrow = Configuration.numberOfRows
 			val ncol = Configuration.numberOfCols
 
+			setNumThreads(Array.ofDim[Long](nrow))
+
 			// stvorimo prvu matricu
 			val firstMatrix = createMatrix(nrow, ncol)
 			// stvorimo drugu matricu
@@ -36,6 +39,9 @@ object MatrixMultiplication {
 			val f = matrixMultiply(nrow, ncol, firstMatrix, transposedMatrix)
 
 			Await.result(f, Duration.Inf)
+
+			//println(getThreads.length)
+			//println(getDistinctThreads.length)
 		}
 
 		// ispišemo prosječnu brzinu izvršavanja
@@ -47,16 +53,19 @@ object MatrixMultiplication {
 
 	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]]): Future[List[List[Int]]] = {
 
-		val seqOfFutures = firstMatrix.map(x => multiplyRowByMatrix(x, secondMatrix))
+		val seqOfFutures = firstMatrix.zipWithIndex.map(x => {
+
+			multiplyRowByMatrix(x._2, x._1, secondMatrix)
+		})
 
 		val allFutures = Future.sequence(seqOfFutures)
 
 		allFutures
 	}
 
-	def multiplyRowByMatrix(row: List[Int], secondMatrix: List[List[Int]]): Future[List[Int]] = Future {
+	def multiplyRowByMatrix(index: Int, row: List[Int], secondMatrix: List[List[Int]]): Future[List[Int]] = Future {
 
-		MeasurementHelpers.addCurrentThread()
+		addCurrentThread(index)
 
 		secondMatrix.map(x => multiplyRows(row, x))
 	}

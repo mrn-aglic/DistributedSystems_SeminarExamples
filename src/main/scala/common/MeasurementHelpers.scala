@@ -7,27 +7,24 @@ import java.util.Date
   */
 object MeasurementHelpers {
 
-	private var _numThreads = List[Long]()
+	private var _numThreads: Array[Long] = _
 
-	def addCurrentThread(): Unit = _numThreads = Thread.currentThread().getId :: _numThreads
+	def setNumThreads(arr: Array[Long]): Unit = _numThreads = arr
 
-	def numThread(): List[Long] = _numThreads
+	def addCurrentThread(index: Int): Unit = _numThreads.update(index, Thread.currentThread().getId)
 
-	def getDistinctThreads: List[Long] = _numThreads.distinct
+	def numThread(): Array[Long] = _numThreads
 
-	def getAndClearThreadsList(): List[Long] = {
+	def getThreads: Array[Long] = _numThreads
+	def getDistinctThreads: Array[Long] = _numThreads.distinct
 
-		val temp = _numThreads
-		_numThreads = List[Long]()
+	def getAndClearThreadsList(): Array[Long] = {
+
+		val temp = getDistinctThreads
+		_numThreads = Array[Long]()
 
 		//println(temp.distinct.length)
 		temp.distinct
-	}
-
-	def addCurrentThreadWith[A](block: => A): A = {
-
-		addCurrentThread()
-		block
 	}
 
 	def time[A](block: => A, num: Option[Int]): (Long, A) = {
@@ -52,7 +49,7 @@ object MeasurementHelpers {
 		(duration, result)
 	}
 
-	def runNTimes[A](n: Int)(block: => A): List[(Int, Long, List[Long])] = {
+	def runNTimes[A](n: Int)(block: => A): List[(Int, Long, Array[Long])] = {
 
 		for{
 			i <- 1 to n
