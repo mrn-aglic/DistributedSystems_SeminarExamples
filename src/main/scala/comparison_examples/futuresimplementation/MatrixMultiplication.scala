@@ -22,12 +22,12 @@ object MatrixMultiplication {
 
 		val runNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
+		setNumThreads(Array.ofDim[List[Long]](Configuration.numberOfRows))
+
 		val results = runNTimes {
 
 			val nrow = Configuration.numberOfRows
 			val ncol = Configuration.numberOfCols
-
-			setNumThreads(Array.ofDim[Long](nrow))
 
 			// stvorimo prvu matricu
 			val firstMatrix = createMatrix(nrow, ncol)

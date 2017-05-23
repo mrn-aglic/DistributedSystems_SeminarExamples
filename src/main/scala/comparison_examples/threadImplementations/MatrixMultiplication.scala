@@ -24,6 +24,9 @@ object MatrixMultiplication {
 
 	    val runNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
+	    val array = Array.ofDim[List[Long]](Configuration.numberOfRows)
+	    MeasurementHelpers.setNumThreads(array)
+
 	    val results = runNTimes {
 
 		    val nrow = Configuration.numberOfRows
@@ -52,9 +55,6 @@ object MatrixMultiplication {
 		val result = Array.ofDim[List[Int]](nrow)
 
 		var threads = List[Thread]()
-
-		val array = Array.ofDim[Long](nrow)
-		MeasurementHelpers.setNumThreads(array)
 
 		for(i <- 0 until nrow){
 

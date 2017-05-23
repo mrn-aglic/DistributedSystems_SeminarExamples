@@ -1,5 +1,7 @@
 package comparison_examples.threadImplementations
 
+import common.MeasurementHelpers.setNumThreads
+
 import scala.concurrent.Future
 import scala.util.Random
 
@@ -23,6 +25,7 @@ object MatrixMultiplication_Functional {
 		val n: Double = Configuration.runTimes
 
 		val runNTimes = MeasurementHelpers.runNTimes(n.toInt) _
+		MeasurementHelpers.setNumThreads(Array.ofDim[List[Long]](Configuration.numberOfRows))
 
 		val results = runNTimes {
 
@@ -52,8 +55,6 @@ object MatrixMultiplication_Functional {
 	def matrixMultiply(nrow: Int, ncol: Int, firstMatrix: List[List[Int]], secondMatrix: List[List[Int]]): List[List[Int]] = {
 
 		var result = Array.ofDim[List[Int]](nrow)
-
-		MeasurementHelpers.setNumThreads(Array.ofDim[Long](nrow))
 
 		val threads = firstMatrix.zipWithIndex.map { case(x, index) => thread {
 

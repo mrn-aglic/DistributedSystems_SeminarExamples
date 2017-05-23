@@ -11,6 +11,9 @@ object ProducerConsumer {
 
 	private val sharedQueue = mutable.Queue[Item]()
 
+	var timesOfStartingThreads: List[Long] = List[Long]()
+	var timesOfCreatingAllConsumers: List[Long] = List[Long]()
+
 	def main(args: Array[String]): Unit = {
 
 		val n: Double = if(args.nonEmpty) args(0).toDouble else Configuration.runTimes.toDouble
@@ -18,15 +21,19 @@ object ProducerConsumer {
 
 		val funRunNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
+		setNumThreads(Array.ofDim[List[Long]](numConsumers))
+
 		val results = funRunNTimes {
 
 			Helper.isFinished = false
 
-			setNumThreads(Array.ofDim[Long](numConsumers))
-
 			val producer = new Producer(sharedQueue)
 
+			val now = System.currentTimeMillis()
 			val cs = startConsumers(numConsumers, List[Consumer](), sharedQueue)
+			val cur = System.currentTimeMillis()
+
+			timesOfCreatingAllConsumers = (cur - now ) :: timesOfCreatingAllConsumers
 
 			cs.foreach(_.join())
 			producer.join()
@@ -37,6 +44,11 @@ object ProducerConsumer {
 		println(s"Run times: $n")
 		println(s"Average duration: ${results.map(x => x._2).sum / n} milliseconds")
 
+		println(s"Time of starting threads: ${timesOfStartingThreads.sum / n}")
+		println(s"Time of creating consumers: ${timesOfCreatingAllConsumers.sum / n}")
+
+		println(results.map(x => x._3.length).sum / n)
+
 		println()
 	}
 
@@ -44,7 +56,11 @@ object ProducerConsumer {
 		if (max == 0) result
 		else {
 			val consumer = new Consumer(max - 1, sharedQueue)
+			val now = System.currentTimeMillis()
 			consumer.start()
+			val cur = System.currentTimeMillis()
+
+			timesOfStartingThreads = (cur - now)::timesOfStartingThreads
 
 			startConsumers(max - 1, consumer :: result, sharedQueue)
 		}

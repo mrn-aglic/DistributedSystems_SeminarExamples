@@ -22,11 +22,11 @@ object ProducerConsumer {
 
 		val funRunNTimes = MeasurementHelpers.runNTimes(n.toInt) _
 
+		setNumThreads(Array.ofDim[List[Long]](numConsumers))
+
 		val results = funRunNTimes {
 
 			val p = Promise[Boolean]()
-
-			setNumThreads(Array.ofDim[Long](numConsumers))
 
 			val producer = new Producer(p, sharedQueue)
 			val cs = startConsumers(numConsumers, List[Consumer](), sharedQueue, p)
@@ -95,8 +95,6 @@ class Consumer(index:Int, p: Promise[Boolean], sharedQueue: mutable.Queue[Item])
 
 	def start(): Future[Unit] = Future {
 
-		addCurrentThread(index)
-
 		while (sharedQueue.nonEmpty || !p.isCompleted) {
 
 			obtainedItems = getItem match {
@@ -115,6 +113,8 @@ class Consumer(index:Int, p: Promise[Boolean], sharedQueue: mutable.Queue[Item])
 
 				sharedQueue.wait()
 			}
+
+			addCurrentThread(index)
 
 			val result = if (sharedQueue.nonEmpty)
 				Some(sharedQueue.dequeue())
