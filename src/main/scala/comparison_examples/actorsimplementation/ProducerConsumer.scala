@@ -163,7 +163,7 @@ class ConsumerActor(index: Int) extends Actor {
 	def receive: Receive = {
 
 		case msg@Item(x) =>
-			
+
 			MeasurementHelpers.addCurrentThread(index)
 
 			obtainedItems = msg :: obtainedItems
